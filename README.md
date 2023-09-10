@@ -31,9 +31,16 @@ The applicaiton should not store too much state except for caching the user's pl
 
 The database that will be used in a production setting will probably be mysql given its high read performance and schema flexiblity. In terms of Hosting probably something like planetscale would be perfect.
 
+The application will be coded in a modular fashion to not be tied down to a storage solution
+
 
 <h4> Local Testing </h4>
 Locally We will ensure we use depedencies that do not need cloud involvement. For Local Testing we will mock the message brokers by using Channels to mimic the pub sub behavior and for the db we can opt for a  dockerized mysql soltuion or  a sqlite. Given how simple the models are sqlite might be the better solution here.
+
+
+<h4> Doucmentation </h4>
+
+Documentation will be hosted via swagger docs.
 
 
 <center> <h3> Front End </h3> </center>
