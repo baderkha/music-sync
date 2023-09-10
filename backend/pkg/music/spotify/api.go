@@ -18,8 +18,8 @@ const (
 )
 
 var (
-	_ music.PlayListQueryer         = &API{}
-	_ music.SongQueryer             = &API{}
+	_ music.PlayListManager         = &API{}
+	_ music.SongManager             = &API{}
 	_ music.UserInformationProvider = &API{}
 	t                               = fmt.Sprintf
 )
@@ -34,6 +34,33 @@ func NewAPI(token string) *API {
 	return &API{
 		client: resty.New().SetHeader("Authorization", "Bearer "+token).SetBaseURL(BASEURL),
 	}
+}
+
+type URIBuilder struct {
+	ResourceType string
+	ID           string
+}
+
+func (u *URIBuilder) WithResourceType(r string) *URIBuilder {
+	u.ResourceType = r
+	return u
+}
+
+func (u *URIBuilder) AsTrack() *URIBuilder {
+	return u.WithResourceType("track")
+}
+
+func (u *URIBuilder) WithID(ID string) *URIBuilder {
+	u.ID = ID
+	return u
+}
+
+func (u *URIBuilder) ToString() string {
+	return fmt.Sprintf("spotify:%s:%s", u.ResourceType, u.ID)
+}
+
+func NewURI() *URIBuilder {
+	return new(URIBuilder)
 }
 
 type API struct {
@@ -149,10 +176,10 @@ func (s *API) SSearch(resMax int, name string) ([]*music.Song, error) {
 	return songs, nil
 }
 
-func (s *API) PSearch(userID string, p *music.PaginatedRequest) (*music.OptionallyPaginatedResult[music.PlayList], error) {
+func (s *API) PSearch(userID string, p music.PaginatedRequester) (*music.OptionallyPaginatedResult[music.PlayList], error) {
 	// Implement logic to search for playlists by user ID on Spotify
 	// Use s.client to make HTTP GET request
-	res, err := H(s.client.R().Get(t("users/%s/playlists?limit=%d&offset=%d", userID, p.Limit, p.Offset)))
+	res, err := H(s.client.R().Get(t("users/%s/playlists?limit=%d&offset=%s", userID, p.GetLimit(), p.GetOffsetOrToken())))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +189,7 @@ func (s *API) PSearch(userID string, p *music.PaginatedRequest) (*music.Optional
 		return nil, err
 	}
 
-	playlists := make([]*music.PlayList, 0, p.Limit)
+	playlists := make([]*music.PlayList, 0, p.GetLimit())
 	items, _ := container.Path("items").Children()
 
 	for _, item := range items {
@@ -182,8 +209,8 @@ func (s *API) PSearch(userID string, p *music.PaginatedRequest) (*music.Optional
 	}, nil
 }
 
-func (s *API) SGetByPlaylistID(pID string, p *music.PaginatedRequest) (*music.OptionallyPaginatedResult[music.Song], error) {
-	res, err := H(s.client.R().Get(t("playlists/%s/tracks?limit=%d&offset=%d", pID, p.Limit, p.Offset)))
+func (s *API) SGetByPlaylistID(pID string, p music.PaginatedRequester) (*music.OptionallyPaginatedResult[music.Song], error) {
+	res, err := H(s.client.R().Get(t("playlists/%s/tracks?limit=%d&offset=%s", pID, p.GetLimit(), p.GetOffsetOrToken())))
 	if err != nil {
 		return nil, err
 	}
@@ -222,19 +249,29 @@ func (s *API) SGetByPlaylistID(pID string, p *music.PaginatedRequest) (*music.Op
 }
 
 func (s *API) PGetByID(playListID string) (*music.PlayList, error) {
-	// Implement logic to fetch a playlist by its ID from Spotify
-	// Use s.client to make s calls
-	// Parse the response into a PlayList struct
-	return nil, nil
+
+	res, err := H(s.client.R().Get(t("playLists/%s", playListID)))
+	if err != nil {
+		return nil, err
+	}
+
+	container, err := gabs.ParseJSON(res.Body())
+	if err != nil {
+		return nil, err
+	}
+	return &music.PlayList{
+		ID:    container.Path("id").String(),
+		Title: container.Path("name").String(),
+	}, nil
 }
 
-func (s *API) PCreatePlayList(p *music.PlayList) error {
+func (s *API) PCreate(p *music.PlayList) error {
 	// Implement logic to create a new playlist on Spotify
 	// Use s.client to make s calls
 	return nil
 }
 
-func (s *API) PUpdatePlayList(p *music.PlayList) error {
+func (s *API) PUpdate(p *music.PlayList) error {
 	// Implement logic to update an existing playlist on Spotify
 	// Use s.client to make s calls
 	return nil
@@ -243,5 +280,12 @@ func (s *API) PUpdatePlayList(p *music.PlayList) error {
 func (s *API) PDeletePlayList(pID string) error {
 	// Implement logic to delete a playlist on Spotify by its ID
 	// Use s.client to make s calls
+	return nil
+}
+
+func (s *API) PAddSongs(pID string, sID ...string) error {
+	return nil
+}
+func (s *API) PRemoveSongs(pID string, sID ...string) error {
 	return nil
 }

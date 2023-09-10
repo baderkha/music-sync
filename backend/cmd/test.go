@@ -34,7 +34,7 @@ func main() {
 	// }
 	// spew.Dump(api.SGetByID(res[0].ID))
 
-	spew.Dump(api.SGetByPlaylistID("5y0or2fDc6evQ4oETccuPc", &music.PaginatedRequest{
+	spew.Dump(api.SGetByPlaylistID("5y0or2fDc6evQ4oETccuPc", &music.PaginatedLimitOffsetReq{
 		Offset: 0,
 		Limit:  1,
 	}))

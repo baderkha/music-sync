@@ -9,16 +9,18 @@ type PlayList struct {
 
 type PlayListReader interface {
 	PGetByID(playListID string) (*PlayList, error)
-	PSearch(userID string, p *PaginatedRequest) (*OptionallyPaginatedResult[PlayList], error)
+	PSearch(userID string, p PaginatedRequester) (*OptionallyPaginatedResult[PlayList], error)
+}
+
+type PlayListWriter interface {
+	PCreate(p *PlayList) error
+	PUpdate(p *PlayList) error
+	PDeletePlayList(pID string) error
+	PAddSongs(pID string, sID ...string) error
+	PRemoveSongs(pID string, sID ...string) error
 }
 
 type PlayListManager interface {
-	PCreatePlayList(p *PlayList) error
-	PUpdatePlayList(p *PlayList) error
-	PDeletePlayList(pID string) error
-}
-
-type PlayListQueryer interface {
 	PlayListReader
-	PlayListManager
+	PlayListWriter
 }
