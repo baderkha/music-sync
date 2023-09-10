@@ -18,10 +18,15 @@ const (
 )
 
 var (
-	_ music.PlayListQueryer = &API{}
-	_ music.SongQueryer     = &API{}
-	t                       = fmt.Sprintf
+	_ music.PlayListQueryer         = &API{}
+	_ music.SongQueryer             = &API{}
+	_ music.UserInformationProvider = &API{}
+	t                               = fmt.Sprintf
 )
+
+func TrimQ(s string) string {
+	return strings.Trim(s, `"`)
+}
 
 func NewAPI(token string) *API {
 	token = strings.Trim(token, "\n")
@@ -59,6 +64,22 @@ func H(res *resty.Response, err error) (*resty.Response, error) {
 			Provider: Provider,
 		}
 	}
+}
+
+func (s *API) CurrentUser() (*music.User, error) {
+	res, err := H(s.client.R().Get(t("me")))
+	if err != nil {
+		return nil, err
+	}
+	container, err := gabs.ParseJSON(res.Body())
+	if err != nil {
+		return nil, err
+	}
+	return &music.User{
+		ID:        strings.ReplaceAll(container.Path("id").String(), `"`, ""),
+		Name:      strings.ReplaceAll(container.Path("display_name").String(), `"`, ""),
+		Followers: int(container.Path("followers.total").Data().(float64)),
+	}, nil
 }
 
 func (s *API) SGetByID(ID string) (*music.Song, error) {
@@ -128,10 +149,10 @@ func (s *API) SSearch(resMax int, name string) ([]*music.Song, error) {
 	return songs, nil
 }
 
-func (s *API) PSearch(userID string, p *music.PaginatedRequest) (*music.PagintatedResult[music.PlayList], error) {
+func (s *API) PSearch(userID string, p *music.PaginatedRequest) (*music.OptionallyPaginatedResult[music.PlayList], error) {
 	// Implement logic to search for playlists by user ID on Spotify
 	// Use s.client to make HTTP GET request
-	res, err := H(s.client.R().Get(t("users/%s/playlists", userID)))
+	res, err := H(s.client.R().Get(t("users/%s/playlists?limit=%d&offset=%d", userID, p.Limit, p.Offset)))
 	if err != nil {
 		return nil, err
 	}
@@ -141,19 +162,63 @@ func (s *API) PSearch(userID string, p *music.PaginatedRequest) (*music.Pagintat
 		return nil, err
 	}
 
-	playlists := make([]*music.PlayList, 0, p.Size)
+	playlists := make([]*music.PlayList, 0, p.Limit)
 	items, _ := container.Path("items").Children()
 
 	for _, item := range items {
 		playlist := music.PlayList{
-			ID:    item.Path("id").Data().(string),
-			Title: item.Path("name").Data().(string),
+			ID:    TrimQ(item.Path("id").Data().(string)),
+			Title: TrimQ(item.Path("name").Data().(string)),
+			Link:  item.Path("href").String(),
 		}
 
 		playlists = append(playlists, &playlist)
 	}
 
-	return &music.PagintatedResult[music.PlayList]{Data: playlists}, nil
+	return &music.OptionallyPaginatedResult[music.PlayList]{
+		Data:         playlists,
+		IsPaginated:  true,
+		TotalRecords: int(container.Path("total").Data().(float64)),
+	}, nil
+}
+
+func (s *API) SGetByPlaylistID(pID string, p *music.PaginatedRequest) (*music.OptionallyPaginatedResult[music.Song], error) {
+	res, err := H(s.client.R().Get(t("playlists/%s/tracks?limit=%d&offset=%d", pID, p.Limit, p.Offset)))
+	if err != nil {
+		return nil, err
+	}
+
+	// "href": "https://api.spotify.com/v1/playlists/5y0or2fDc6evQ4oETccuPc/tracks",
+	fmt.Println(string(res.Body()))
+	container, err := gabs.ParseJSON(res.Body())
+	_ = container
+	if err != nil {
+		return nil, err
+	}
+	items, _ := container.Path("items").Children()
+	songs := make([]*music.Song, len(items))
+	for i, v := range items {
+		artists, err := v.Path("track.artists").Children()
+		if err != nil {
+			return nil, err
+		}
+
+		arts := make([]string, len(artists))
+
+		for i, child := range artists {
+			arts[i] = child.Path("name").String()
+		}
+		songs[i] = &music.Song{
+			ID:      v.Path("track.id").String(),
+			Title:   v.Path("track.name").String(),
+			Authors: arts,
+		}
+	}
+	return &music.OptionallyPaginatedResult[music.Song]{
+		Data:         songs,
+		TotalRecords: int(container.Path("total").Data().(float64)),
+		IsPaginated:  true,
+	}, nil
 }
 
 func (s *API) PGetByID(playListID string) (*music.PlayList, error) {

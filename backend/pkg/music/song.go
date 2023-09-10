@@ -9,6 +9,7 @@ type Song struct {
 type SongReader interface {
 	SGetByID(ID string) (*Song, error)
 	SSearch(resMax int, name string) ([]*Song, error)
+	SGetByPlaylistID(pID string, p *PaginatedRequest) (*OptionallyPaginatedResult[Song], error)
 }
 
 type SongQueryer interface {

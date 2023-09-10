@@ -1,18 +1,15 @@
 package music
 
 type PlayList struct {
-	ID               string
-	Title            string
-	Creator          string
-	ImageURL         string
-	OptionaImageMeta map[string]interface{}
-	Link             string
-	Songs            []*Song
+	ID        string
+	Title     string
+	ImageURLs []string
+	Link      string
 }
 
 type PlayListReader interface {
 	PGetByID(playListID string) (*PlayList, error)
-	PSearch(userID string, p *PaginatedRequest) (*PagintatedResult[PlayList], error)
+	PSearch(userID string, p *PaginatedRequest) (*OptionallyPaginatedResult[PlayList], error)
 }
 
 type PlayListManager interface {
