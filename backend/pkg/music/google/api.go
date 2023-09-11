@@ -59,14 +59,6 @@ func (u *URIBuilder) ToString() string {
 	return fmt.Sprintf("spotify:%s:%s", u.ResourceType, u.ID)
 }
 
-func UrifyManyTracks(trackIDs ...string) []string {
-	var out []string = make([]string, len(trackIDs))
-	for i, v := range trackIDs {
-		out[i] = NewURI().AsTrack().WithID(v).ToString()
-	}
-	return out
-}
-
 func NewURI() *URIBuilder {
 	return new(URIBuilder)
 }
@@ -280,10 +272,9 @@ func (s *API) PCreate(p *music.PlayList) error {
 }
 
 func (s *API) PUpdate(p *music.PlayList) error {
-	return &music.OperationNotSupported{
-		Provider:  Provider,
-		Operation: "Update a playlist",
-	}
+	// Implement logic to update an existing playlist on Spotify
+	// Use s.client to make s calls
+	return nil
 }
 
 func (s *API) PDeletePlayList(pID string) error {
@@ -293,29 +284,8 @@ func (s *API) PDeletePlayList(pID string) error {
 }
 
 func (s *API) PAddSongs(pID string, sID ...string) error {
-	_, err := H(s.
-		client.
-		R().
-		SetBody(map[string]interface{}{
-			"uris":     UrifyManyTracks(sID...),
-			"position": 0,
-		}).
-		Post(t("playLists/%s/tracks", pID)))
-	if err != nil {
-		return err
-	}
 	return nil
 }
 func (s *API) PRemoveSongs(pID string, sID ...string) error {
-	_, err := H(s.
-		client.
-		R().
-		SetBody(map[string]interface{}{
-			"tracks": UrifyManyTracks(sID...),
-		}).
-		Delete(t("playLists/%s/tracks", pID)))
-	if err != nil {
-		return err
-	}
 	return nil
 }

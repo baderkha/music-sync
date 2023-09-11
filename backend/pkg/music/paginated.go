@@ -14,6 +14,8 @@ type OptionallyPaginatedResult[T any] struct {
 type PaginatedRequester interface {
 	GetLimit() int
 	GetOffsetOrToken() string
+	SetLimit(l int) PaginatedRequester
+	SetOffsetOrToken(s string) PaginatedRequester
 }
 
 type PaginatedLimitOffsetReq struct {

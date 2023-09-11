@@ -9,6 +9,7 @@ type PlayList struct {
 
 type PlayListReader interface {
 	PGetByID(playListID string) (*PlayList, error)
+	PGetByIDs(playListIDs ...string) ([]*PlayList, error)
 	PSearch(userID string, p PaginatedRequester) (*OptionallyPaginatedResult[PlayList], error)
 }
 

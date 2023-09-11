@@ -6,4 +6,5 @@ type StreamingServiceProvider interface {
 	SongManager
 	UserInformationProvider
 	WithAuthorizer(a Authorizer) StreamingServiceProvider
+	NewPaginator() PaginatedRequester
 }

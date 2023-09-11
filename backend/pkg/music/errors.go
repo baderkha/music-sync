@@ -24,3 +24,12 @@ type UnexpectedFatalError struct {
 func (s *UnexpectedFatalError) Error() string {
 	return fmt.Sprintf("Unexpected fatal error casued by %s from the provider (%s)", s.OgError.Error(), s.Provider)
 }
+
+type OperationNotSupported struct {
+	Provider  string
+	Operation string
+}
+
+func (s *OperationNotSupported) Error() string {
+	return fmt.Sprintf("This operation (%s) is not supported by %s", s.Operation, s.Provider)
+}
