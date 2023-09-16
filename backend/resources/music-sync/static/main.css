@@ -191,3 +191,14 @@ a {
 .table{
     margin-bottom: 0px !important;
 }
+
+
+.htmx-settling tr.deactivate td {
+    background: lightcoral;
+  }
+  .htmx-settling tr.activate td {
+    background: darkseagreen;
+  }
+  tr td {
+    transition: all 1.2s;
+  }

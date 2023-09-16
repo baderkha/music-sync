@@ -4,3 +4,5 @@ start:
 	go run cmd/test.go
 start-fs:
 	go run cmd/fullstack/full_stack.go
+init:
+	mkdir -p build/fullstack
