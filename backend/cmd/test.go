@@ -1,42 +1,64 @@
 package main
 
 import (
-	"os"
+	"fmt"
+	"sync"
 
-	"github.com/baderkha/music-sync/backend/pkg/music"
-	"github.com/baderkha/music-sync/backend/pkg/music/spotify"
-	"github.com/davecgh/go-spew/spew"
+	"golang.org/x/sync/errgroup"
 )
 
-func main() {
-	secret, err := os.ReadFile("./secrets/tmp_spot_secret")
-	_ = secret
-	if err != nil {
-		panic(err)
-	}
-	api := spotify.NewAPI(string(""))
-	// cu, err := api.CurrentUser()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// spew.Dump(api.PSearch(cu.ID, &music.PaginatedRequest{
-	// 	Offset: 0,
-	// 	Limit:  40,
-	// }))
-	// 	fmt.Println("querying for music")
-	// res, err := api.SSearch(10, "enter sandman")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// if len(res) == 0 {
-	// 	fmt.Println("no music")
-	// 	os.Exit(0)
-	// }
-	// spew.Dump(api.SGetByID(res[0].ID))
+// type Cache struct {
+// 	data map[string]any
+// 	mu   *sync.RWMutex
+// }
 
-	spew.Dump(api.SGetByPlaylistID("5y0or2fDc6evQ4oETccuPc", &music.PaginatedLimitOffsetReq{
-		Offset: 0,
-		Limit:  1,
-	}))
+// func (c *Cache) Set(k string, v any) {
+// 	c.mu.Lock()
+// 	c.data[k] = v
+// 	c.mu.Unlock()
+// }
+
+// func (c *Cache) Get(k string) (value any, isFound bool) {
+// 	c.mu.RLock()
+// 	val, ok := c.data[k]
+// 	c.mu.RUnlock()
+// 	return val, ok
+// }
+
+// func NewCache() *Cache {
+// 	var (
+// 		mu sync.RWMutex
+// 	)
+// 	return &Cache{
+// 		data: make(map[string]any),
+// 		mu:   &mu,
+// 	}
+
+// }
+
+func main() {
+
+	var (
+		jobs          = []string{"job1", "job2", "job3", "job4", "job5", "job6"}
+		res  []string = make([]string, len(jobs))
+		mu   sync.Mutex
+		wg   errgroup.Group
+	)
+	wg.SetLimit(3)
+
+	for _, job := range jobs {
+		wg.Go(func(job string) func() error {
+			return func() error {
+				mu.Lock()
+				res = append(res, job)
+				mu.Unlock()
+				return nil
+			}
+		}(job))
+	}
+
+	wg.Wait()
+
+	fmt.Printf("%v", res)
 
 }

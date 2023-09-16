@@ -7,6 +7,11 @@ type PlayList struct {
 	Link      string
 }
 
+type PlayListWithMusic struct {
+	PlayList
+	Songs []*Song
+}
+
 type PlayListReader interface {
 	PGetByID(playListID string) (*PlayList, error)
 	PGetByIDs(playListIDs ...string) ([]*PlayList, error)
