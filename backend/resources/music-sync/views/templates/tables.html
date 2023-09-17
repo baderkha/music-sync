@@ -27,13 +27,22 @@
             </tr>
         </thead>
         <tbody>
+            {{$ActionButtonHidden := .ActionButtonHidden}}
+            {{$cols := .Columns}}
             {{range $idx,$a := .Data}}
             <tr class="clickable-row">
-               
+                {{if not $ActionButtonHidden}}
+                <td>
+                    <div class="form-check form-switch ">
+                        <input name="check[{{$idx}}]" class="form-check-input" type="checkbox" role="switch"
+                            id="flexSwitchCheckDefault">
+                    </div>
+                </td>
+                {{end}}
                 <td scope="row">{{add $idx 1}}</th>
-                    {{range $i,$val := $a}}
-                <td scope="row" name="${i}">{{$val}}</th>
-                    <input name="{{$i}}[{{$idx}}]" type="hidden" value="{{$val}}">
+                    {{range $i,$val := $cols}}
+                <td scope="row" name="${val}">{{index $a $val}}</th>
+                    <input name="{{$i}}[{{$idx}}]" type="hidden" value="{{index $a $val}}">
                     {{end}}
             </tr>
             {{end}}

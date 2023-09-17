@@ -1,6 +1,10 @@
 package component
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/tkrajina/go-reflector/reflector"
+)
 
 type PlayListData struct {
 	Title   string
@@ -17,7 +21,7 @@ type TrackData struct {
 
 type SyncData struct {
 	Label   string
-	LastRun string
+	LastRun string `header:"Last Run"`
 	From    string
 	To      string
 	Status  string
@@ -66,14 +70,34 @@ func NewTable[T any](rows []T) *Table {
 	var (
 		inInterface []map[string]interface{}
 		keys        []string
+		keyMap      map[string]string = make(map[string]string)
 	)
 	inrec, _ := json.Marshal(rows)
 	json.Unmarshal(inrec, &inInterface)
 
 	if len(inInterface) > 0 {
-		for k := range inInterface[0] {
-			keys = append(keys, k)
+		ref := reflector.New(rows[0])
+		fields := ref.FieldsFlattened()
+		for _, v := range fields {
+			res, err := v.Tag("header")
+			if err != nil || res == "" {
+				keys = append(keys, v.Name())
+				continue
+			}
+			keys = append(keys, res)
+			keyMap[v.Name()] = res
+
 		}
+
+		if len(keyMap) > 0 {
+			for _, mp := range inInterface {
+				for ogKey, NewKey := range keyMap {
+					val := mp[ogKey]
+					mp[NewKey] = val
+				}
+			}
+		}
+
 	}
 	return &Table{
 		Data:    inInterface,
