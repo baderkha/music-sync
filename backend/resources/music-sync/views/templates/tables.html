@@ -3,12 +3,12 @@
     <table class="table  table-hover table-striped table-dark multiple-select" data-toggle="table">
         <thead>
             <tr>
-                <th scope="col" colspan="{{add (len .columns) +2}}">
+                <th scope="col" colspan="{{add (len .Columns) +2}}">
                     <div class="d-flex justify-content-between">
-                        <div>{{.table_title}}</div>
-                        {{if not .action_button_hidden}}
-                            <button type="button" class="btn btn-success" hx-post="{{.action_post_link}}" hx-trigger="click"
-                            hx-target="#no_op_table">{{.action_title}}</button>
+                        <div>{{.TableTitle}}</div>
+                        {{if not .ActionButtonHidden}}
+                            <button type="button" class="btn btn-success" hx-post="{{.ActionPostLink}}" hx-trigger="click"
+                            hx-target="#no_op_table">{{.ActionTitle}}</button>
                         {{end}}
                        
                     </div>
@@ -17,22 +17,19 @@
 
             </tr>
             <tr>
-                <th>{{.boolean_btn_name}}</th>
+                {{if not .ActionButtonHidden}}
+                    <th>{{.BooleanBtnName}}</th>
+                {{end}}
                 <th scope="col">#</th>
-                {{range $i,$a:=.columns}}
+                {{range $i,$a:=.Columns}}
                 <th scope="col">{{$a}}</th>
                 {{end}}
             </tr>
         </thead>
         <tbody>
-            {{range $idx,$a := .data}}
+            {{range $idx,$a := .Data}}
             <tr class="clickable-row">
-                <td>
-                    <div class="form-check form-switch ">
-                        <input name="check[{{$idx}}]" class="form-check-input" type="checkbox" role="switch"
-                            id="flexSwitchCheckDefault">
-                    </div>
-                </td>
+               
                 <td scope="row">{{add $idx 1}}</th>
                     {{range $i,$val := $a}}
                 <td scope="row" name="${i}">{{$val}}</th>
