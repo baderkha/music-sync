@@ -1,8 +1,6 @@
 package component
 
-import (
-	"github.com/tkrajina/go-reflector/reflector"
-)
+import "encoding/json"
 
 type PlayListData struct {
 	Title   string
@@ -25,57 +23,60 @@ type SyncData struct {
 	Status  string
 }
 
-type Table[T any] struct {
+type Table struct {
 	ActionPostLink     string
 	BooleanBtnName     string
 	ActionTitle        string
 	TableTitle         string
 	Columns            []string
-	Data               []T
+	Data               []map[string]any
 	ActionButtonHidden bool
 }
 
-func (t *Table[T]) WithActionButtonHidden(b bool) *Table[T] {
+func (t *Table) WithActionButtonHidden(b bool) *Table {
 	t.ActionButtonHidden = b
 	return t
 }
 
-func (t *Table[T]) WithActionTitle(title string) *Table[T] {
+func (t *Table) WithActionTitle(title string) *Table {
 	t.ActionTitle = title
 	return t
 }
 
-func (t *Table[T]) WithBooleanBtnName(name string) *Table[T] {
+func (t *Table) WithBooleanBtnName(name string) *Table {
 	t.BooleanBtnName = name
 	return t
 }
 
-func (t *Table[T]) WithActionPostLink(link string) *Table[T] {
+func (t *Table) WithActionPostLink(link string) *Table {
 	t.ActionPostLink = link
 	return t
 }
 
-func (t *Table[T]) WithTableTitle(title string) *Table[T] {
+func (t *Table) WithTableTitle(title string) *Table {
 	t.TableTitle = title
 	return t
 }
 
-func (h *Table[T]) GetTemplate() string {
+func (h *Table) GetTemplate() string {
 	return "tables.html"
 }
 
-func NewTable[T any](rows []T) *Table[T] {
-	var cols []string
-	if len(rows) > 0 {
-		refl := reflector.New(rows[0])
-		fields := refl.FieldsFlattened()
-		cols = make([]string, len(fields))
-		for i, v := range fields {
-			cols[i] = v.Name()
+func NewTable[T any](rows []T) *Table {
+	var (
+		inInterface []map[string]interface{}
+		keys        []string
+	)
+	inrec, _ := json.Marshal(rows)
+	json.Unmarshal(inrec, &inInterface)
+
+	if len(inInterface) > 0 {
+		for k := range inInterface[0] {
+			keys = append(keys, k)
 		}
 	}
-	return &Table[T]{
-		Data:    rows,
-		Columns: cols,
+	return &Table{
+		Data:    inInterface,
+		Columns: keys,
 	}
 }
