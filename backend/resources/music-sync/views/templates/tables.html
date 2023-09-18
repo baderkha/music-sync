@@ -7,8 +7,13 @@
                     <div class="d-flex justify-content-between">
                         <div>{{.TableTitle}}</div>
                         {{if not .ActionButtonHidden}}
-                            <button type="button" class="btn btn-success" hx-post="{{.ActionPostLink}}" hx-trigger="click"
-                            hx-target="#no_op_table">{{.ActionTitle}}</button>
+                            <button type="button" class="btn btn-success" 
+                            hx-post="{{.ActionPostLink}}" 
+                            hx-trigger="click"
+                            hx-target="#modals-here"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modals-here"
+                            >{{.ActionTitle}}</button>
                         {{end}}
                        
                     </div>
@@ -49,3 +54,13 @@
         </tbody>
     </table>
 </form>
+
+
+<div id="modals-here"
+    class="modal modal-blur fade"
+    aria-hidden="false"
+    tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>

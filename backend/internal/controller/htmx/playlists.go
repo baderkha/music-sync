@@ -19,3 +19,11 @@ func PlayLists(c *gin.Context) (com component.IComponent, err error) {
 		WithBooleanBtnName("Sync").
 		WithActionTitle("Sync"), nil
 }
+
+func ProcessPlayList(c *gin.Context) (com component.IComponent, err error) {
+	return &component.Modal{
+		Title:            "Where Do You Want to process?",
+		TextBody:         "Choose where you want to process it",
+		CloseButtonTitle: "Exit",
+	}, nil
+}
