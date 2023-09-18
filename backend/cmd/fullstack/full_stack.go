@@ -34,7 +34,7 @@ func main() {
 	router.LoadHTMLGlob(filepath.Join(tmplatDir, "*"))
 	router.GET("/", htmx.Gin(htmx.HomePage))
 
-	router.POST("/playlists/process", htmx.Gin(htmx.ProcessPlayList))
+	router.POST("/playlists/process", htmx.GinC(htmx.ProcessPlayList))
 
 	router.GET("/playlists", htmx.Gin(htmx.PlayLists))
 

@@ -1,8 +1,11 @@
 package htmx
 
 import (
+	"github.com/baderkha/music-sync/backend/internal/response/view"
 	"github.com/baderkha/music-sync/backend/internal/response/view/component"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
+	"github.com/maragudk/gomponents"
 )
 
 func PlayLists(c *gin.Context) (com component.IComponent, err error) {
@@ -20,10 +23,10 @@ func PlayLists(c *gin.Context) (com component.IComponent, err error) {
 		WithActionTitle("Sync"), nil
 }
 
-func ProcessPlayList(c *gin.Context) (com component.IComponent, err error) {
-	return &component.Modal{
-		Title:            "Where Do You Want to process?",
-		TextBody:         "Choose where you want to process it",
-		CloseButtonTitle: "Exit",
-	}, nil
+func ProcessPlayList(c *gin.Context) (node gomponents.Node, err error) {
+	spew.Dump("called")
+	return view.
+		ProcessPlayListModal(&view.ProcessPlayList{
+			ServiceSelection: []string{"Spotify", "Youtube Music"},
+		}), nil
 }

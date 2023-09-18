@@ -27,7 +27,7 @@ type SyncData struct {
 	Status  string
 }
 
-type Table struct {
+type Tbl struct {
 	ActionPostLink     string
 	BooleanBtnName     string
 	ActionTitle        string
@@ -37,36 +37,36 @@ type Table struct {
 	ActionButtonHidden bool
 }
 
-func (t *Table) WithActionButtonHidden(b bool) *Table {
+func (t *Tbl) WithActionButtonHidden(b bool) *Tbl {
 	t.ActionButtonHidden = b
 	return t
 }
 
-func (t *Table) WithActionTitle(title string) *Table {
+func (t *Tbl) WithActionTitle(title string) *Tbl {
 	t.ActionTitle = title
 	return t
 }
 
-func (t *Table) WithBooleanBtnName(name string) *Table {
+func (t *Tbl) WithBooleanBtnName(name string) *Tbl {
 	t.BooleanBtnName = name
 	return t
 }
 
-func (t *Table) WithActionPostLink(link string) *Table {
+func (t *Tbl) WithActionPostLink(link string) *Tbl {
 	t.ActionPostLink = link
 	return t
 }
 
-func (t *Table) WithTableTitle(title string) *Table {
+func (t *Tbl) WithTableTitle(title string) *Tbl {
 	t.TableTitle = title
 	return t
 }
 
-func (h *Table) GetTemplate() string {
+func (h *Tbl) GetTemplate() string {
 	return "tables.html"
 }
 
-func NewTable[T any](rows []T) *Table {
+func NewTable[T any](rows []T) *Tbl {
 	var (
 		inInterface []map[string]interface{}
 		keys        []string
@@ -99,7 +99,7 @@ func NewTable[T any](rows []T) *Table {
 		}
 
 	}
-	return &Table{
+	return &Tbl{
 		Data:    inInterface,
 		Columns: keys,
 	}
