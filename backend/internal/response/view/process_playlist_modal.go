@@ -10,12 +10,13 @@ type ProcessPlayList struct {
 }
 
 func ProcessPlayListModal(data *ProcessPlayList) gomponents.Node {
-	return component.ModalC(
+	return component.CustomModalC(
 		&component.ModalData{
 			Title: "Where would you like to Sync your playlist?",
 			Body: component.SelectC(&component.SelectData{
 				Options:    data.ServiceSelection,
 				HelperText: "Select a Service",
+				FormName:   "service_select",
 			}),
 			Footer: component.ModalFooterActionButtonsC(
 				&component.ModalActionButtonData{

@@ -10,6 +10,7 @@ import (
 type SelectData struct {
 	Options    []string
 	HelperText string
+	FormName   string
 }
 
 func SelectC(dat *SelectData) gomponents.Node {
@@ -31,5 +32,6 @@ func SelectC(dat *SelectData) gomponents.Node {
 		c.Classes{
 			"form-select": true,
 		},
+		Name(dat.FormName),
 	)
 }

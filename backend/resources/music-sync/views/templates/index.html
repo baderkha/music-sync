@@ -85,7 +85,7 @@ htmx.logger = function(elt, event, data) {
                     <span class="nav_logo-name">Music Sync</span>
                 </a>
                 <div class="nav_list">
-                    <a href="#" class="nav_link text-decoration-none active" hx-trigger="load, click"
+                    <a href="#" class="nav_link text-decoration-none active" hx-trigger="load, click, from:document"
                         hx-target="#body-render" hx-get="/playlists">
                         <i class='bx bxs-playlist nav_icon'></i>
                         <span class="nav_name">Playlists </span>

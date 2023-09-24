@@ -35,6 +35,7 @@ func ModalFooterActionButtonsC(m *ModalActionButtonData) gomponents.Node {
 			append(
 				m.ActionButtonExtraAttributes,
 				Class("btn btn-primary"),
+				DataAttr("bs-dismiss", "modal"),
 				gomponents.Text(m.ActionButtonTitle),
 			)...,
 		),
@@ -46,7 +47,7 @@ func ModalFooterActionButtonsC(m *ModalActionButtonData) gomponents.Node {
 	)
 }
 
-func ModalC(d *ModalData) gomponents.Node {
+func CustomModalC(d *ModalData) gomponents.Node {
 	return Div(
 		Div(
 			Div(
